@@ -16,7 +16,7 @@
 
 <body>
   <div class="ui grid">
-    <div class="ui twelve wide column">
+    <div class="ui eight wide column">
       <div class="ui card">
         <div id="divCopyright">
           Data @ <a href="https://vtuber.magictea.cc/rank/vtuber">https://vtuber.magictea.cc/rank/vtuber</a>. Sorted by
@@ -26,7 +26,7 @@
           Showing data of the most subscribed <span id="clipAmount">100</span> livers.
         </div>
         <div>
-          Only show the most-subscribed 
+          Only show the most-subscribed
           <div class="ui input">
             <input id="clipInput" type="text" value="100">
           </div>
@@ -36,16 +36,21 @@
 
           <div id="filterAiDiv" class="ui checkbox">
             <input id="filterAi" type="checkbox" tabindex="0" class="hidden">
-            <label>Filter Kizuna Ai <span style="color: grey">(to make the graph more sensible)</span></label>
+            <label>Filter Kizuna Ai <span style="color: grey">(to make the graph more informative)</span></label>
           </div>
         </div>
       </div>
     </div>
+    <div id="kaStatus" class="ui four wide column">
+    </div>
   </div>
 
-  <div id="main" class="player" style="width: 600px;height:400px;"></div>
-  <div id="play" class="player" style="width: 600px;height:400px;"></div>
-  <div id="incr" class="player" style="width: 600px;height:400px;"></div>
+  <div id="charts">
+      <div id="main" class="player"></div>
+      <div id="play" class="player"></div>
+      <div id="incr" class="player"></div>
+      <div id="trans" class="player"></div>
+  </div>
 
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
@@ -64,6 +69,7 @@
     var followChart = echarts.init(document.getElementById('main'));
     var playChart = echarts.init(document.getElementById('play'));
     var incrChart = echarts.init(document.getElementById('incr'));
+    var transChart = echarts.init(document.getElementById('trans'));
 
     $('#btnClip').click(() => {
       CLIP_AMOUNT = Number($('#clipInput').val());
@@ -82,150 +88,71 @@
       vtdataorig = data.tables;
       console.log("Fetched.");
       drawMap();
+      let ka = vtdataorig[0];
+      let sec = vtdataorig[1];
+      $('#kaStatus').html(`
+      Kizuna Ai: <br>
+            Sub +${ka.suber - sec.suber} than 2nd. (${((ka.suber - sec.suber) / sec.suber * 100).toFixed(2)}% more than 2nd) <br>
+            View +${ka.totalplay - sec.totalplay} than 2nd. (${((ka.totalplay - sec.totalplay) / sec.totalplay * 100).toFixed(2)}% more than 2nd)
+      `);
     });
+
+    function doChart(data, text, chart, displayName, names) {
+      chart.setOption(option = {
+        title: {
+          text: text
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          data: names,
+          show: CLIP_AMOUNT < 9 ? true : false,
+        },
+        yAxis: {
+          splitLine: {
+            show: false
+          }
+        },
+        toolbox: {
+          left: 'center',
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
+        series: {
+          name: displayName,
+          type: 'line',
+          data: data,
+          markLine: {
+            silent: true,
+            data: [{
+              yAxis: 50
+            }, {
+              yAxis: 100
+            }, {
+              yAxis: 150
+            }, {
+              yAxis: 200
+            }, {
+              yAxis: 300
+            }]
+          }
+        }
+      });
+    }
 
     function drawMap() {
       let vtdata = vtdataorig.slice(KA_FILTER ? 1 : 0, CLIP_AMOUNT);
-      followChart.setOption(option = {
-        title: {
-          text: 'VTuber at Bilibili - Fans'
-        },
-        tooltip: {
-          trigger: 'axis'
-        },
-        xAxis: {
-          data: vtdata.map(item => item.name),
-          show: CLIP_AMOUNT < 9 ? true : false,
-        },
-        yAxis: {
-          splitLine: {
-            show: false
-          }
-        },
-        toolbox: {
-          left: 'center',
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        series: {
-          name: 'Fans',
-          type: 'line',
-          data: vtdata.map(item => item.suber),
-          markLine: {
-            silent: true,
-            data: [{
-              yAxis: 50
-            }, {
-              yAxis: 100
-            }, {
-              yAxis: 150
-            }, {
-              yAxis: 200
-            }, {
-              yAxis: 300
-            }]
-          }
-        }
-      });
-
-      playChart.setOption(option = {
-        title: {
-          text: 'VTuber at Bilibili - Plays'
-        },
-        tooltip: {
-          trigger: 'axis'
-        },
-        xAxis: {
-          data: vtdata.map(item => item.name),
-          show: CLIP_AMOUNT < 9 ? true : false,
-        },
-        yAxis: {
-          splitLine: {
-            show: false
-          }
-        },
-        toolbox: {
-          left: 'center',
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        series: {
-          name: 'Plays',
-          type: 'line',
-          data: vtdata.map(item => item.totalplay),
-          markLine: {
-            silent: true,
-            data: [{
-              yAxis: 50
-            }, {
-              yAxis: 100
-            }, {
-              yAxis: 150
-            }, {
-              yAxis: 200
-            }, {
-              yAxis: 300
-            }]
-          }
-        }
-      });
-
-    incrChart.setOption(option = {
-        title: {
-          text: 'VTuber at Bilibili - Sub delta'
-        },
-        tooltip: {
-          trigger: 'axis'
-        },
-        xAxis: {
-          data: vtdata.map(item => item.name),
-          show: CLIP_AMOUNT < 9 ? true : false,
-        },
-        yAxis: {
-          splitLine: {
-            show: false
-          }
-        },
-        toolbox: {
-          left: 'center',
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        series: {
-          name: 'Sub delta',
-          type: 'line',
-          data: vtdata.map(item => item.incr),
-          markLine: {
-            silent: true,
-            data: [{
-              yAxis: 50
-            }, {
-              yAxis: 100
-            }, {
-              yAxis: 150
-            }, {
-              yAxis: 200
-            }, {
-              yAxis: 300
-            }]
-          }
-        }
-      });
+      let names = vtdata.map(item => item.name);
+      doChart(vtdata.map(item => item.totalplay), 'VTuber at Bilibili - Plays', playChart, 'Plays', names);
+      doChart(vtdata.map(item => item.suber), 'VTuber at Bilibili - Subscribers', followChart, 'Subs:', names);
+      doChart(vtdata.map(item => item.incr), 'VTuber at Bilibili - Subscriber delta', incrChart, 'Sub delta:', names);
+      doChart(vtdata.map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view:', names);
     }
   </script>
 </body>
