@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>VTuber Bilibili Rank</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+  <style>
+    .ui.card {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ui grid">
+    <div class="ui twelve wide column">
+      <div class="ui card">
+        <div id="divCopyright">
+          Data @ <a href="https://vtuber.magictea.cc/rank/vtuber">https://vtuber.magictea.cc/rank/vtuber</a>. Sorted by
+          fans count. Made by <a href="//github.com/outloudvi">Outloudvi</a> w/ <a href="http://www.echartsjs.com">ECharts</a>.
+        </div>
+        <div>
+          Showing data of the most subscribed <span id="clipAmount">100</span> livers.
+        </div>
+        <div>
+          Only show the most-subscribed 
+          <div class="ui input">
+            <input id="clipInput" type="text" value="100">
+          </div>
+          <button id="btnClip" class="ui button tiny">OK</button>
+
+          <br>
+
+          <div id="filterAiDiv" class="ui checkbox">
+            <input id="filterAi" type="checkbox" tabindex="0" class="hidden">
+            <label>Filter Kizuna Ai <span style="color: grey">(to make the graph more sensible)</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main" class="player" style="width: 600px;height:400px;"></div>
+  <div id="play" class="player" style="width: 600px;height:400px;"></div>
+  <div id="incr" class="player" style="width: 600px;height:400px;"></div>
+
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@4.2.0-rc.2/dist/echarts.js"></script>
+  <script>
+    var CLIP_AMOUNT = 100;
+    var KA_FILTER = false;
+    var vtdataorig;
+
+    $('.player').css('height', 300)
+      .css('width', 0.95 * window.innerWidth)
+      .css('margin', 'auto');
+
+    $('.ui.checkbox').checkbox();
+
+    var followChart = echarts.init(document.getElementById('main'));
+    var playChart = echarts.init(document.getElementById('play'));
+    var incrChart = echarts.init(document.getElementById('incr'));
+
+    $('#btnClip').click(() => {
+      CLIP_AMOUNT = Number($('#clipInput').val());
+      drawMap();
+      $('#clipAmount').text(CLIP_AMOUNT);
+    });
+
+    $('#filterAi').change(() => {
+      KA_FILTER = $('#filterAiDiv').hasClass('checked');
+      drawMap();
+    });
+
+    console.log("Fetching data from Magictea...");
+    $.get('https://vtuber.magictea.cc/assets/vrank_uo.json', function (data) {
+      console.log(data);
+      vtdataorig = data.tables;
+      console.log("Fetched.");
+      drawMap();
+    });
+
+    function drawMap() {
+      let vtdata = vtdataorig.slice(KA_FILTER ? 1 : 0, CLIP_AMOUNT);
+      followChart.setOption(option = {
+        title: {
+          text: 'VTuber at Bilibili - Fans'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          data: vtdata.map(item => item.name),
+          show: CLIP_AMOUNT < 9 ? true : false,
+        },
+        yAxis: {
+          splitLine: {
+            show: false
+          }
+        },
+        toolbox: {
+          left: 'center',
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
+        series: {
+          name: 'Fans',
+          type: 'line',
+          data: vtdata.map(item => item.suber),
+          markLine: {
+            silent: true,
+            data: [{
+              yAxis: 50
+            }, {
+              yAxis: 100
+            }, {
+              yAxis: 150
+            }, {
+              yAxis: 200
+            }, {
+              yAxis: 300
+            }]
+          }
+        }
+      });
+
+      playChart.setOption(option = {
+        title: {
+          text: 'VTuber at Bilibili - Plays'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          data: vtdata.map(item => item.name),
+          show: CLIP_AMOUNT < 9 ? true : false,
+        },
+        yAxis: {
+          splitLine: {
+            show: false
+          }
+        },
+        toolbox: {
+          left: 'center',
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
+        series: {
+          name: 'Plays',
+          type: 'line',
+          data: vtdata.map(item => item.totalplay),
+          markLine: {
+            silent: true,
+            data: [{
+              yAxis: 50
+            }, {
+              yAxis: 100
+            }, {
+              yAxis: 150
+            }, {
+              yAxis: 200
+            }, {
+              yAxis: 300
+            }]
+          }
+        }
+      });
+
+    incrChart.setOption(option = {
+        title: {
+          text: 'VTuber at Bilibili - Sub delta'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          data: vtdata.map(item => item.name),
+          show: CLIP_AMOUNT < 9 ? true : false,
+        },
+        yAxis: {
+          splitLine: {
+            show: false
+          }
+        },
+        toolbox: {
+          left: 'center',
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
+        series: {
+          name: 'Sub delta',
+          type: 'line',
+          data: vtdata.map(item => item.incr),
+          markLine: {
+            silent: true,
+            data: [{
+              yAxis: 50
+            }, {
+              yAxis: 100
+            }, {
+              yAxis: 150
+            }, {
+              yAxis: 200
+            }, {
+              yAxis: 300
+            }]
+          }
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
