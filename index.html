@@ -42,6 +42,10 @@
       </div>
     </div>
     <div id="kaStatus" class="ui four wide column">
+      Fetching data...
+    </div>
+    <div id="lastUpdate" class="ui two wide column">
+      Last update:
     </div>
   </div>
 
@@ -83,11 +87,15 @@
     });
 
     console.log("Fetching data from Magictea...");
-    $.get('https://vtuber.magictea.cc/assets/vrank_uo.json', function (data) {
+    $.get('https://wt-ada99ae843c012425386e0b495883cbc-0.sandbox.auth0-extend.com/vtmtproxy', function (data) {
       console.log(data);
       vtdataorig = data.tables;
       console.log("Fetched.");
       drawMap();
+      $('#lastUpdate').html(`
+        Last update: <br>
+        ${new Date(data.lastupd*1000).toString()}
+      `);
       let ka = vtdataorig[0];
       let sec = vtdataorig[1];
       $('#kaStatus').html(`
