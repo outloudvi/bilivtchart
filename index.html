@@ -158,9 +158,9 @@
       let vtdata = vtdataorig.slice(KA_FILTER ? 1 : 0, CLIP_AMOUNT);
       let names = vtdata.map(item => item.name);
       doChart(vtdata.map(item => item.totalplay), 'VTuber at Bilibili - Plays', playChart, 'Plays', names);
-      doChart(vtdata.map(item => item.suber), 'VTuber at Bilibili - Subscribers', followChart, 'Subs:', names);
-      doChart(vtdata.map(item => item.incr), 'VTuber at Bilibili - Subscriber delta', incrChart, 'Sub delta:', names);
-      doChart(vtdata.map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view:', names);
+      doChart(vtdata.map(item => item.suber), 'VTuber at Bilibili - Subscribers', followChart, 'Subs', names);
+      doChart(vtdata.map(item => item.incr), 'VTuber at Bilibili - Subscriber delta', incrChart, 'Sub delta', names);
+      doChart(vtdata.map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view', names);
     }
   </script>
 </body>
