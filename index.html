@@ -161,7 +161,7 @@
       doChart(vtdata.map(item => item.totalplay), 'VTuber at Bilibili - Plays', playChart, 'Plays', names);
       doChart(vtdata.map(item => item.suber), 'VTuber at Bilibili - Subscribers', followChart, 'Subs', names);
       doChart(vtdata.map(item => item.incr), 'VTuber at Bilibili - Subscriber delta', incrChart, 'Sub delta', names);
-      doChart(vtdata.map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view', names);
+      doChart(vtdata.filter(item => item.mid !== 314062600).map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view', names);
     }
     
     function showInterestingStats() {
@@ -169,10 +169,10 @@
       let totalPlay = 0; for(i of vtdataorig.map(obj => obj.totalplay)) totalPlay += i;
       let totalSub = 0; for(i of vtdataorig.map(obj => obj.suber)) totalSub += i;
       
-      say("--- Interesting Stats of the top 100 subscribed vtubers ---");
+      say("--- Interesting stats of the top 100 subscribed vtubers ---");
       say(` Total play: ${totalPlay}`);
       say(` Total sub: ${totalSub} (not deduplicated)`);
-      say(`--- Interesting Stats of the top 10 subscribed vtubers ---`);
+      say(`--- Detailed stats of the top 10 subscribed vtubers     ---`);
       
       let dataTable = {};
       
