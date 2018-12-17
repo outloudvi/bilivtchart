@@ -103,6 +103,7 @@
             Sub +${ka.suber - sec.suber} than 2nd. (${((ka.suber - sec.suber) / sec.suber * 100).toFixed(2)}% more than 2nd) <br>
             View +${ka.totalplay - sec.totalplay} than 2nd. (${((ka.totalplay - sec.totalplay) / sec.totalplay * 100).toFixed(2)}% more than 2nd)
       `);
+      showInterestingStats();
     });
 
     function doChart(data, text, chart, displayName, names) {
@@ -161,6 +162,33 @@
       doChart(vtdata.map(item => item.suber), 'VTuber at Bilibili - Subscribers', followChart, 'Subs', names);
       doChart(vtdata.map(item => item.incr), 'VTuber at Bilibili - Subscriber delta', incrChart, 'Sub delta', names);
       doChart(vtdata.map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view', names);
+    }
+    
+    function showInterestingStats() {
+      let say = function(x){ console.log('%c'+x, 'font: Roboto; color: #1ab2ff'); };
+      let totalPlay = 0; for(i of vtdataorig.map(obj => obj.totalplay)) totalPlay += i;
+      let totalSub = 0; for(i of vtdataorig.map(obj => obj.suber)) totalSub += i;
+      
+      say("--- Interesting Stats of the top 100 subscribed vtubers ---");
+      say(` Total play: ${totalPlay}`);
+      say(` Total sub: ${totalSub} (not deduplicated)`);
+      say(`--- Interesting Stats of the top 10 subscribed vtubers ---`);
+      
+      let dataTable = {};
+      
+      for(let _i=0; _i<=9; _i++){
+        let per = {};
+        let ctx = vtdataorig[_i];
+        //say(` #${_i+1}: ${ctx.name}, ${ctx.suber}(${(100*ctx.suber/totalSub).toFixed(2)}%) suber, ${ctx.totalplay}(${(100*ctx.totalplay/totalPlay).toFixed(2)}%) views`)
+        per.name = ctx.name;
+        per.suber = ctx.suber
+        // per.subPercent = Number((100*ctx.suber/totalSub).toFixed(2))
+        per.views = ctx.totalplay
+        // per.viewPercent = Number((100*ctx.totalplay/totalPlay).toFixed(2))
+        dataTable[_i+1] = per
+      }
+      
+      console.table(dataTable);
     }
   </script>
 </body>
