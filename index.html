@@ -11,6 +11,12 @@
     .ui.card {
       width: 100%;
     }
+
+    #immigrateHeader {
+      display: none;
+      margin: 1em 5em;
+    }
+
     #divPanel {
       margin-left: 1em;
       padding: 1em;
@@ -20,6 +26,13 @@
 </head>
 
 <body>
+  <div id="immigrateHeader">
+    <div class="ui message">
+      <i class="close icon"></i>
+      <div class="header">We are migrating</div>
+      <p>We are migrating to <a href="https://vtc.outv.im">vtc.outv.im</a>. outvi.ooo is at its sunset.</p>
+    </div>
+  </div>
   <div class="ui grid">
     <div class="ui eight wide column">
       <div id="divPanel" class="ui card">
@@ -56,10 +69,10 @@
   </div>
 
   <div id="charts">
-      <div id="main" class="player"></div>
-      <div id="play" class="player"></div>
-      <div id="incr" class="player"></div>
-      <div id="trans" class="player"></div>
+    <div id="main" class="player"></div>
+    <div id="play" class="player"></div>
+    <div id="incr" class="player"></div>
+    <div id="trans" class="player"></div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -100,7 +113,7 @@
       drawMap();
       $('#lastUpdate').html(`
         Last update: <br>
-        ${new Date(data.lastupd*1000).toString()}
+        ${new Date(data.lastupd * 1000).toString()}
       `);
       let ka = vtdataorig[0];
       let sec = vtdataorig[1];
@@ -156,20 +169,20 @@
       doChart(vtdata.filter(item => item.mid !== 314062600).map(item => item.suber / item.totalplay), 'VTuber at Bilibili - Sub per view', transChart, 'Sub per view', names);
       // Emitted mid=314062600 (游戏部同好会) due to its disbandment.
     }
-    
+
     function showInterestingStats() {
-      let say = function(x){ console.log('%c'+x, 'font: Roboto; color: #1ab2ff'); };
-      let totalPlay = 0; for(i of vtdataorig.map(obj => obj.totalplay)) totalPlay += i;
-      let totalSub = 0; for(i of vtdataorig.map(obj => obj.suber)) totalSub += i;
-      
+      let say = function (x) { console.log('%c' + x, 'font: Roboto; color: #1ab2ff'); };
+      let totalPlay = 0; for (i of vtdataorig.map(obj => obj.totalplay)) totalPlay += i;
+      let totalSub = 0; for (i of vtdataorig.map(obj => obj.suber)) totalSub += i;
+
       say("--- Interesting stats of the top 100 subscribed vtubers ---");
       say(` Total play: ${totalPlay}`);
       say(` Total sub: ${totalSub} (not deduplicated)`);
       say(`--- Detailed stats of the top 10 subscribed vtubers     ---`);
-      
+
       let dataTable = {};
-      
-      for(let _i=0; _i<=9; _i++){
+
+      for (let _i = 0; _i <= 9; _i++) {
         let per = {};
         let ctx = vtdataorig[_i];
         //say(` #${_i+1}: ${ctx.name}, ${ctx.suber}(${(100*ctx.suber/totalSub).toFixed(2)}%) suber, ${ctx.totalplay}(${(100*ctx.totalplay/totalPlay).toFixed(2)}%) views`)
@@ -178,13 +191,26 @@
         // per.subPercent = Number((100*ctx.suber/totalSub).toFixed(2))
         per.views = ctx.totalplay
         // per.viewPercent = Number((100*ctx.totalplay/totalPlay).toFixed(2))
-        dataTable[_i+1] = per
+        dataTable[_i + 1] = per
       }
-      
+
       console.table(dataTable);
-      
-      console.log(`旅老师女装关注数进度： ${vtdataorig.find(x => x.mid===54081).suber}/100000`)
+
+      console.log(`旅老师女装关注数进度： ${vtdataorig.find(x => x.mid === 54081).suber}/100000`)
       console.log("  详情 -> https://t.bilibili.com/223076246263616135")
+    }
+
+    $('.message .close')
+      .on('click', function () {
+        $(this)
+          .closest('.message')
+          .transition('fade')
+          ;
+      })
+      ;
+
+    if (window.location.hostname !== "vtc.outv.im") {
+      $('#immigrateHeader').show();
     }
   </script>
 </body>
