@@ -110,8 +110,7 @@
 
     console.log("Fetching data from Magictea...");
     $.get('https://static.imas.app/vtuber.json', function (data) {
-      console.log(data);
-      vtdataorig = data.tables;
+      vtdataorig = data;
       console.log("Fetched.");
       drawMap();
       $('#lastUpdate').html(`
